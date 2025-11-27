@@ -1,4 +1,4 @@
-import { ScaleLoader } from 'react-spinners'
+// import { ScaleLoader } from 'react-spinners'
 
 const LoadingSpinner = ({ smallHeight }) => {
   return (
@@ -9,7 +9,8 @@ const LoadingSpinner = ({ smallHeight }) => {
       justify-center 
       items-center `}
     >
-      <ScaleLoader size={100} color='lime' />
+      {/* <ScaleLoader size={100} color='lime' /> */}
+      <img className="w-20 animate-spin" src={'https://i.ibb.co.com/4wCJZ08Y/react-JS-Logo.png'} alt="" />
     </div>
   )
 }
