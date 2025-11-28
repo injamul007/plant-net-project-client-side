@@ -3,13 +3,31 @@ import Heading from '../../components/Shared/Heading'
 import Button from '../../components/Shared/Button/Button'
 import PurchaseModal from '../../components/Modal/PurchaseModal'
 import { useState } from 'react'
+import { useParams } from 'react-router'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import LoadingSpinner from '../../components/Shared/LoadingSpinner'
+import ErrorPage from '../ErrorPage'
 
 const PlantDetails = () => {
   let [isOpen, setIsOpen] = useState(false)
+  const {id} = useParams()
+  
+
+  const {data: singlePlant={}, isLoading, isError} = useQuery({
+    queryKey: ['singlePlant', id],
+    queryFn: async() => {
+      const result = await axios.get(`${import.meta.env.VITE_API_URL}/plants/${id}`)
+      return result.data.result;
+    }
+  })
 
   const closeModal = () => {
     setIsOpen(false)
   }
+
+  if (isLoading) return <LoadingSpinner></LoadingSpinner>
+  if (isError) return <ErrorPage></ErrorPage>
 
   return (
     <Container>
@@ -20,8 +38,7 @@ const PlantDetails = () => {
             <div className='w-full overflow-hidden rounded-xl'>
               <img
                 className='object-cover w-full'
-                src='https://i.ibb.co/DDnw6j9/1738597899-golden-money-plant.jpg'
-                alt='header image'
+                src={singlePlant.image}
               />
             </div>
           </div>
@@ -29,17 +46,15 @@ const PlantDetails = () => {
         <div className='md:gap-10 flex-1'>
           {/* Plant Info */}
           <Heading
-            title={'Money Plant'}
-            subtitle={`Category: ${'Succulent'}`}
+            title={singlePlant.name}
+            subtitle={`Category: ${singlePlant.category}`}
           />
           <hr className='my-6' />
           <div
             className='
           text-lg font-light text-neutral-500'
           >
-            Professionally deliver sticky testing procedures for next-generation
-            portals. Objectively communicate just in time infrastructures
-            before.
+            {singlePlant.description}
           </div>
           <hr className='my-6' />
 
@@ -53,7 +68,7 @@ const PlantDetails = () => {
                 gap-2
               '
           >
-            <div>Seller: Shakil Ahmed Atik</div>
+            <div>Seller: {singlePlant.seller?.name}</div>
 
             <img
               className='rounded-full'
@@ -61,7 +76,7 @@ const PlantDetails = () => {
               width='30'
               alt='Avatar'
               referrerPolicy='no-referrer'
-              src='https://lh3.googleusercontent.com/a/ACg8ocKUMU3XIX-JSUB80Gj_bYIWfYudpibgdwZE1xqmAGxHASgdvCZZ=s96-c'
+              src={singlePlant.seller?.photo}
             />
           </div>
           <hr className='my-6' />
@@ -73,12 +88,12 @@ const PlantDetails = () => {
                 text-neutral-500
               '
             >
-              Quantity: 10 Units Left Only!
+              Quantity: {singlePlant.quantity} Units Left Only!
             </p>
           </div>
           <hr className='my-6' />
           <div className='flex justify-between'>
-            <p className='font-bold text-3xl text-gray-500'>Price: 10$</p>
+            <p className='font-bold text-3xl text-gray-500'>Price: ${singlePlant.price}</p>
             <div>
               <Button onClick={() => setIsOpen(true)} label='Purchase' />
             </div>
