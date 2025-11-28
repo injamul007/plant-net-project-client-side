@@ -41,17 +41,18 @@ const SignUp = () => {
       }
 
       //2. User Registration
-      const result = await createUser(email, password);
+      await createUser(email, password);
 
       let imageURL = DEFAULT_AVATAR;
 
       if (imageFile) {
         imageURL = await imageUpload(imageFile) || DEFAULT_AVATAR;
+        // imageURL = await imageUploadCloudinary(imageFile) || DEFAULT_AVATAR;
       }
 
       //3. Save username & profile photo
       await updateUserProfile(name, imageURL);
-      console.log(result.user);
+      // console.log(result.user);
 
       navigate(from, { replace: true });
       toast.success("Signup Successful");
