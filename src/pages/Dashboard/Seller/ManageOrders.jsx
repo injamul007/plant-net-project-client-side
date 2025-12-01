@@ -1,6 +1,22 @@
+import { useQuery } from '@tanstack/react-query'
 import SellerOrderDataRow from '../../../components/Dashboard/TableRows/SellerOrderDataRow'
+import axios from 'axios'
+import useAuth from '../../../hooks/useAuth'
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
 
 const ManageOrders = () => {
+  const {user} = useAuth();
+
+  const {data: sellerOrders=[], isLoading} = useQuery({
+    queryKey:["sellerOrders", user?.email],
+    queryFn: async() => {
+      const result = await axios.get(`${import.meta.env.VITE_API_URL}/seller-product-orders?email=${user?.email}`)
+      return result.data.result;
+    },
+  })
+
+  if(isLoading) return <LoadingSpinner></LoadingSpinner> 
+
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -38,12 +54,6 @@ const ManageOrders = () => {
                       scope='col'
                       className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
                     >
-                      Address
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal'
-                    >
                       Status
                     </th>
 
@@ -56,7 +66,9 @@ const ManageOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <SellerOrderDataRow />
+                  {
+                    sellerOrders.map(sellerOrder => <SellerOrderDataRow key={sellerOrder._id} sellerOrder={sellerOrder} />)
+                  }
                 </tbody>
               </table>
             </div>
