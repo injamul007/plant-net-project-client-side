@@ -1,6 +1,23 @@
+import { useQuery } from '@tanstack/react-query';
 import PlantDataRow from '../../../components/Dashboard/TableRows/PlantDataRow'
+import useAuth from '../../../hooks/useAuth';
+import axios from 'axios';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
 
 const MyInventory = () => {
+
+  const {user} = useAuth();
+
+  const {data: myInventory=[], isLoading} = useQuery({
+    queryKey: ["MyInventory", user.email],
+    queryFn: async() => {
+      const result = await axios.get(`${import.meta.env.VITE_API_URL}/my-inventory?email=${user.email}`)
+      return result.data.result;
+    }
+  });
+
+  if(isLoading) return <LoadingSpinner></LoadingSpinner>
+
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -56,7 +73,9 @@ const MyInventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <PlantDataRow />
+                  {
+                    myInventory.map(inventory => <PlantDataRow key={inventory._id} inventory={inventory} />)
+                  }
                 </tbody>
               </table>
             </div>
