@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 import { toast } from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { useForm } from "react-hook-form";
-import { imageUpload } from "../../Utils";
+import { imageUpload, saveOrUpdateUser } from "../../Utils";
 
 const SignUp = () => {
   const DEFAULT_AVATAR =
@@ -50,28 +50,47 @@ const SignUp = () => {
         // imageURL = await imageUploadCloudinary(imageFile) || DEFAULT_AVATAR;
       }
 
+      const userData = {
+        name,
+        email,
+        photo: imageURL,
+      }
+
+      await saveOrUpdateUser(userData);
+      
       //3. Save username & profile photo
       await updateUserProfile(name, imageURL);
       // console.log(result.user);
-
+      
       navigate(from, { replace: true });
       toast.success("Signup Successful");
     } catch (err) {
       console.log(err);
+      console.log(err?.response?.data?.message);
       toast.error(err?.message);
     }
   };
-
+  
   // Handle Google Signin
   const handleGoogleSignIn = async () => {
     try {
       //User Registration using google
-      await signInWithGoogle();
-
+      const result = await signInWithGoogle();
+      
       navigate(from, { replace: true });
       toast.success("Signup Successful");
+
+      const userData = {
+        name: result.user?.displayName,
+        email: result.user?.email,
+        photo: result.user?.photoURL,
+      }
+
+      await saveOrUpdateUser(userData);
+
     } catch (err) {
       console.log(err);
+      console.log(err?.response?.data?.message);
       toast.error(err?.message);
     }
   };

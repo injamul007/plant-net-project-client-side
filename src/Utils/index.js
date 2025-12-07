@@ -25,3 +25,9 @@ export const imageUploadCloudinary = async (imageData) => {
   );
   return imgData.data.secure_url;
 };
+
+//? save or update user in db
+export const saveOrUpdateUser = async(userData) => {
+  const result = await axios.post(`${import.meta.env.VITE_API_URL}/users`, userData)
+  return result.data.result;
+}
